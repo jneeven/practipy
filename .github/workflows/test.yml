@@ -32,4 +32,4 @@ jobs:
       - name: Check package version conflicts
         run: pip check
       - name: Run unit tests
-        run: pytest -vv . -n auto
+        run: pytest -vv . -n auto --suppress-no-test-exit-code

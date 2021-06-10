@@ -9,7 +9,7 @@ _camel_re2 = re.compile("([a-z0-9])([A-Z])")
 def camel2words(string: str):
     """Convert CamelCase to 'spaced words' Copied from https://github.com/fastai/fastcor
     e/blob/0df9c4a8e9a1756fe26fccffab8976195563c8a9/fastcore/basics.py."""
-    return re.sub(_c2w_re, rf" \1", string)
+    return re.sub(_c2w_re, r" \1", string)
 
 
 def camel2snake(string: str):
