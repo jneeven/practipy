@@ -1,0 +1,2 @@
+# practipy
+Python practicalities
