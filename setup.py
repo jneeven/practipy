@@ -7,7 +7,7 @@ def requires(filename: str):
 
 setup(
     name="practipy",
-    version="0.0.0.dev1",
+    version="0.0.0.dev2",
     author="Jelmer Neeven",
     author_email="jelmer@neeven.tech",
     license="MIT",
