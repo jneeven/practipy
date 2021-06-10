@@ -3,5 +3,6 @@ docformatter==1.4
 flake8==3.8.4
 isort==5.7.0
 pytest==6.2.2
+pytest-custom-exit-code==0.3.0
 pytest-xdist==2.2.1
 pytype==2021.3.3

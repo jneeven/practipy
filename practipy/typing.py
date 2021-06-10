@@ -7,7 +7,8 @@ def _typeerr(arg, val, typ):
 
 def type_hints(f):
     """Same as `typing.get_type_hints` but returns `{}` if not allowed type."""
-    return typing.get_type_hints(f) if isinstance(f, typing._allowed_types) else {}
+    allowed_types = typing._allowed_types  # type:ignore
+    return typing.get_type_hints(f) if isinstance(f, allowed_types) else {}
 
 
 def annotations(o):

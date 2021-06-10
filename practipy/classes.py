@@ -14,4 +14,4 @@ class AttrDict(dict):
         (self.__setitem__, super().__setattr__)[k[0] == "_"](k, v)
 
     def __dir__(self):
-        return super().__dir__() + list(self.keys())
+        return dir(super()) + list(self.keys())
