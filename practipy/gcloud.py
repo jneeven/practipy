@@ -1,3 +1,4 @@
+import math
 import os
 from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
@@ -105,7 +106,7 @@ def network_futures_progress_bar(
     total_bytes = 0
     events = []
     # Update either every 100 events or every 1% of the number of events
-    interval = min(100, len(futures) // 100)
+    interval = min(100, math.ceil(len(futures) / 100.0))
     for f, future in enumerate(progress_bar):
         event = future.result()
         events.append(event)
