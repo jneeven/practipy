@@ -4,6 +4,9 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Literal, Sequence, Union
 
+from google.cloud import storage as gcs
+from tqdm import tqdm
+
 from practipy.text import remove_prefix
 
 """
@@ -36,7 +39,6 @@ def download_files(
     Returns the list of local filepaths.
     Note: paths are relative to `gs://<bucket_name>`!.
     """
-    from google.cloud import storage as gcs
 
     bucket = gcs.Client(project=project).get_bucket(bucket)
     blobs = [bucket.blob(gcs_path) for gcs_path in gcs_paths]
@@ -68,7 +70,6 @@ def upload_folder(project: str, source_dir: Union[Path, str], target_dir: str) -
 
     Note: The bucket should be included in the target path!
     """
-    from google.cloud import storage as gcs
 
     source_dir = Path(source_dir)
 
@@ -97,7 +98,6 @@ def network_futures_progress_bar(
 ) -> List[TransferEvent]:
     """Given a sequence of futures that return TransferEvents, display a progress bar
     that computes the transfer speed and finally return the list of TransferEvents."""
-    from tqdm import tqdm
 
     progress_bar = tqdm(
         as_completed(futures), total=len(futures), desc=f"{mode.capitalize()}ing files"
