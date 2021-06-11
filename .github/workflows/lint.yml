@@ -28,7 +28,7 @@ jobs:
           key: ${{ runner.os }}-pip3-${{ hashFiles('*requirements.txt') }}
       - run: pip install wheel
       - name: Install dependencies
-        run: pip install -e .[dev]
+        run: pip install -e .[all]
       - name: Run Flake8
         run: flake8
       - name: Black code style

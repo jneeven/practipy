@@ -28,7 +28,7 @@ jobs:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip3-${{ hashFiles('*requirements.txt') }}
       - name: Install dependencies
-        run: pip install -e .[dev]
+        run: pip install -e .[all]
       - name: Check package version conflicts
         run: pip check
       - name: Run unit tests
