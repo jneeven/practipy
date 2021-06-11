@@ -18,7 +18,10 @@ setup(
     platforms=["Linux"],
     packages=find_packages(),
     install_requires=[],
-    extras_require={"dev": requires("dev-requirements.txt")},
+    extras_require={
+        "dev": requires("dev-requirements.txt"),
+        "gcloud": requires("requirements/gcloud.txt"),
+    },
     classifiers=[
         "License :: OSI Approved :: MIT License",
         "Intended Audience :: Developers",

@@ -22,6 +22,13 @@ def camel2snake(string: str):
     return re.sub(_camel_re2, r"\1_\2", s1).lower()
 
 
+def remove_prefix(string: str, prefix: str):
+    # Removes the specified prefix from the string, if present.
+    if string.startswith(prefix):
+        string = string[len(prefix) :]
+    return string
+
+
 def snake2camel(string: str):
     """Convert snake_case to CamelCase.
 
