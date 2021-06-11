@@ -44,7 +44,7 @@ def download_files(
     blobs = [bucket.blob(gcs_path) for gcs_path in gcs_paths]
     download_dir = Path(download_dir)
 
-    def download_blob(blob: gcs.Blob) -> int:
+    def download_blob(blob: gcs.Blob) -> TransferEvent:
         relative_path = remove_prefix(blob.name, strip_prefix)
         local_path = download_dir.joinpath(relative_path)
         num_bytes = 0
@@ -81,7 +81,7 @@ def upload_folder(project: str, source_dir: Union[Path, str], target_dir: str) -
     bucket = gcs.Client(project=project).get_bucket(str(bucket_name))
 
     # Note: This will overwrite any blobs that already exist.
-    def upload_file(file: Path) -> int:
+    def upload_file(file: Path) -> TransferEvent:
         blob = bucket.blob(os.path.join(target_dir, str(file.relative_to(source_dir))))
         blob.upload_from_filename(str(file))
         return TransferEvent(file.stat().st_size, str(file), blob.name)
