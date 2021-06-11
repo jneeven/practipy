@@ -14,7 +14,7 @@ extras_require["all"] = [requirement for requirement in extras_require.values()]
 
 setup(
     name="practipy",
-    version="0.0.0.dev3",
+    version="0.0.0.dev4",
     author="Jelmer Neeven",
     author_email="jelmer@neeven.tech",
     license="MIT",
