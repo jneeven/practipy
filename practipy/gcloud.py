@@ -33,6 +33,7 @@ def download_files(
     gcs_paths: Sequence[str],
     download_dir: Union[Path, str],
     strip_prefix: str = "",
+    keep_order: bool = True,
 ) -> List[str]:
     """Strips `strip_prefix` from all GCS paths in `gcs_paths` and then downloads them
     to `download_dir` on the local filesystem, creating it if it does not yet exist.
@@ -60,7 +61,7 @@ def download_files(
     # Create a ThreadPool to download multiple files in parallel
     with ThreadPoolExecutor() as e:
         futures = [e.submit(download_blob, blob) for blob in blobs]
-        events = network_futures_progress_bar(futures)
+        events = network_futures_progress_bar(futures, keep_order=keep_order)
 
     return [event.target_path for event in events]
 
@@ -91,17 +92,20 @@ def upload_folder(project: str, source_dir: Union[Path, str], target_dir: str) -
     # Create a ThreadPool to upload multiple files in parallel
     with ThreadPoolExecutor() as e:
         futures = [e.submit(upload_file, file) for file in files if file.is_file()]
-        network_futures_progress_bar(futures, mode="upload")
+        network_futures_progress_bar(futures, mode="upload", keep_order=False)
 
 
 def network_futures_progress_bar(
-    futures: Sequence[Future], mode: Literal["download", "upload"] = "download"
+    futures: Sequence[Future],
+    mode: Literal["download", "upload"] = "download",
+    keep_order: bool = True,
 ) -> List[TransferEvent]:
     """Given a sequence of futures that return TransferEvents, display a progress bar
     that computes the transfer speed and finally return the list of TransferEvents."""
 
+    iterable = futures if keep_order else as_completed(futures)
     progress_bar = tqdm(
-        as_completed(futures), total=len(futures), desc=f"{mode.capitalize()}ing files"
+        iterable, total=len(futures), desc=f"{mode.capitalize()}ing files"
     )
     total_bytes = 0
     events = []
