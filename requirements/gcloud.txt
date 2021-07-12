@@ -1,2 +1,2 @@
-google-cloud-storage~=1.38
-tqdm~=4.61
+google-cloud-storage>=1.38
+tqdm>=4.61
