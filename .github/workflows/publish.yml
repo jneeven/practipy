@@ -9,7 +9,6 @@ on:
 
 jobs:
   release:
-    needs: [update_datasets]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -24,7 +23,7 @@ jobs:
           PACKAGE_VERSION: ${{ github.event.inputs.version }}
         run: python setup.py bdist_wheel
       - name: Upload wheel
-        run: twine upload dist/* -u admin -p '${{ secrets.PYPI_ADMIN_PASSWORD }}' --repository-url 'https://pip.plumerai.com' --verbose
+        run: twine upload dist/* -u __token__ -p '${{ secrets.PYPI_PASSWORD }}'
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
