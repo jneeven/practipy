@@ -1,3 +1,5 @@
+import os
+
 from setuptools import find_packages, setup
 
 
@@ -14,7 +16,7 @@ extras_require["all"] = [requirement for requirement in extras_require.values()]
 
 setup(
     name="practipy",
-    version="0.0.0.dev6",
+    version=os.getenv("PACKAGE_VERSION"),
     author="Jelmer Neeven",
     author_email="jelmer@neeven.tech",
     license="MIT",

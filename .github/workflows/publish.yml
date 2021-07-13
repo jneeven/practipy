@@ -1,27 +1,34 @@
-name: Publish
+name: Release pip package
 
 on:
-  release:
-    types: [published]
-    tags:
-      - v*
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Semantic version"
+        required: true
 
 jobs:
-  build:
+  release:
+    needs: [update_datasets]
     runs-on: ubuntu-latest
-  
     steps:
       - uses: actions/checkout@v2
       - name: Set up Python 3.8
-        uses: actions/setup-python@v2.2.1
+        uses: actions/setup-python@v2
         with:
           python-version: 3.8
-      - name: Upgrade setuptools
-        run: pip install --upgrade setuptools wheel
-      - name: Build distribution
-        run: python setup.py sdist bdist_wheel
-      - name: Publish package
-        uses: pypa/gh-action-pypi-publish@master
+      - name: Install requirements
+        run: pip install twine wheel
+      - name: Create wheel
+        env:
+          PACKAGE_VERSION: ${{ github.event.inputs.version }}
+        run: python setup.py bdist_wheel
+      - name: Upload wheel
+        run: twine upload dist/* -u admin -p '${{ secrets.PYPI_ADMIN_PASSWORD }}' --repository-url 'https://pip.plumerai.com' --verbose
+      - uses: "marvinpinto/action-automatic-releases@latest"
         with:
-          user: __token__
-          password: ${{ secrets.pypi_password }}
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          prerelease: false
+          title: v${{ github.event.inputs.version}}
+          files: dist/*
+          automatic_release_tag: v${{ github.event.inputs.version }}
