@@ -101,9 +101,9 @@ def upload_files(
     target_dir: str,
     strip_prefix: str = "",
 ) -> None:
-    """Upload all provided files from the local filesystem into `target_dir`
-    on GCS. `strip_prefix` is removed from each local filepath and the remainder is
-    appended to `target_dir` to create the target path.
+    """Upload all provided files from the local filesystem into `target_dir` on GCS.
+    `strip_prefix` is removed from each local filepath and the remainder is appended to
+    `target_dir` to create the target path.
 
     Note: The bucket should be included in the target path!
     """
