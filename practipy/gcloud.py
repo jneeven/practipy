@@ -95,6 +95,40 @@ def upload_folder(project: str, source_dir: Union[Path, str], target_dir: str) -
         network_futures_progress_bar(futures, mode="upload", keep_order=False)
 
 
+def upload_files(
+    project: str,
+    paths: Sequence[Union[Path, str]],
+    target_dir: str,
+    strip_prefix: str = "",
+) -> None:
+    """Upload all provided files from the local filesystem into `target_dir`
+    on GCS. `strip_prefix` is removed from each local filepath and the remainder is
+    appended to `target_dir` to create the target path.
+
+    Note: The bucket should be included in the target path!
+    """
+
+    # Remove any gs:// prefix and split the bucket name off the target dir
+    target_dir = Path(remove_prefix(target_dir, "gs://"))
+    bucket_name = target_dir.parts[0]
+    target_dir = str(target_dir.relative_to(bucket_name))
+
+    bucket = gcs.Client(project=project).get_bucket(str(bucket_name))
+
+    # Note: This will overwrite any blobs that already exist.
+    def upload_file(file: Path) -> TransferEvent:
+        blob = bucket.blob(
+            os.path.join(target_dir, remove_prefix(str(file), strip_prefix).strip("/"))
+        )
+        blob.upload_from_filename(str(file))
+        return TransferEvent(file.stat().st_size, str(file), blob.name)
+
+    # Create a ThreadPool to upload multiple files in parallel
+    with ThreadPoolExecutor() as e:
+        futures = [e.submit(upload_file, path) for path in paths]
+        network_futures_progress_bar(futures, mode="upload", keep_order=False)
+
+
 def network_futures_progress_bar(
     futures: Sequence[Future],
     mode: Literal["download", "upload"] = "download",
