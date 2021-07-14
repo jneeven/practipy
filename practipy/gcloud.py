@@ -93,7 +93,7 @@ def upload_folder(
     # Note: This will overwrite any blobs that already exist.
     def upload_file(file: Path) -> TransferEvent:
         blob = bucket.blob(os.path.join(target_dir, str(file.relative_to(source_dir))))
-        blob.upload_from_filename(str(file))
+        blob.upload_from_filename(str(file), checksum="md5")
         return TransferEvent(file.stat().st_size, str(file), blob.name)
 
     files = source_dir.glob("**/*")
@@ -132,7 +132,7 @@ def upload_files(
         blob = bucket.blob(
             os.path.join(target_dir, remove_prefix(str(file), strip_prefix).strip("/"))
         )
-        blob.upload_from_filename(str(file))
+        blob.upload_from_filename(str(file), checksum="md5")
         return TransferEvent(file.stat().st_size, str(file), blob.name)
 
     # Create a ThreadPool to upload multiple files in parallel
