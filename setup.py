@@ -10,6 +10,7 @@ def requires(filename: str):
 extras_require = {
     "dev": requires("dev-requirements.txt"),
     "gcloud": requires("requirements/gcloud.txt"),
+    "math": requires("requirements/math.txt"),
 }
 # Add an extra install option to install ALL requirements.
 extras_require["all"] = [requirement for requirement in extras_require.values()]
