@@ -12,8 +12,7 @@ from practipy.text import remove_prefix
 
 """
 TODO:
-- Add download_folder
-- Return iterator instead of list
+- Return generator instead of list?
 """
 
 
@@ -24,6 +23,54 @@ class TransferEvent:
     num_bytes: int
     source_path: str
     target_path: str
+
+
+def download_folder(
+    project: str,
+    source_dir: str,
+    target_dir: Union[Path, str],
+    progress_bar: bool = True,
+):
+    """Download all the contents of `source_dir` on GCS `target_dir` on the local
+    filesystem.
+
+    Note: The bucket should be included in the source path!
+    """
+    target_dir = Path(target_dir)
+
+    # Remove any gs:// prefix and split the bucket name off the source dir
+    source_dir = Path(remove_prefix(source_dir, "gs://"))
+    bucket_name = source_dir.parts[0]
+    source_dir = str(source_dir.relative_to(bucket_name))
+    client = gcs.Client(project=project)
+
+    def download_blob(blob: gcs.Blob) -> TransferEvent:
+        relative_path = remove_prefix(blob.name, source_dir)
+        local_path = target_dir.joinpath(relative_path.strip("/"))
+
+        num_bytes = 0
+        # If this is an empty folder, just create it, don't download it.
+        if relative_path.endswith("/"):
+            local_path.mkdir(exist_ok=True)
+        # Otherwise, make sure the folder for this file exists and download the file.
+        elif not local_path.exists():
+            local_path.parent.mkdir(exist_ok=True, parents=True)
+            blob.download_to_filename(str(local_path))
+            # blob.size is unreliable and may return None for some reason...
+            num_bytes = local_path.stat().st_size
+
+        return TransferEvent(num_bytes, blob.name, str(local_path))
+
+    # We simply download all blobs that are prefixed with the source dir
+    blobs = list(client.list_blobs(bucket_name, prefix=source_dir))
+
+    # Create a ThreadPool to download multiple files in parallel
+    with ThreadPoolExecutor() as e:
+        futures = [e.submit(download_blob, blob) for blob in blobs]
+        if progress_bar:
+            network_futures_progress_bar(futures, mode="download", keep_order=False)
+        else:
+            wait(futures)
 
 
 def download_files(
