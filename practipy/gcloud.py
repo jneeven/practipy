@@ -31,7 +31,9 @@ def download_folder(
     target_dir: Union[Path, str],
     progress_bar: bool = True,
 ):
-    """Download all the contents of `source_dir` on GCS `target_dir` on the local filesystem.
+    """Download all the contents of `source_dir` on GCS `target_dir` on the local
+    filesystem.
+
     Note: The bucket should be included in the source path!
     """
     target_dir = Path(target_dir)
