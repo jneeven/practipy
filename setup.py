@@ -9,6 +9,7 @@ def requires(filename: str):
 
 extras_require = {
     "dev": requires("dev-requirements.txt"),
+    "cache": requires("requirements/cache.txt"),
     "gcloud": requires("requirements/gcloud.txt"),
     "math": requires("requirements/math.txt"),
 }
