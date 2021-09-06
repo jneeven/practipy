@@ -29,6 +29,13 @@ def remove_prefix(string: str, prefix: str):
     return string
 
 
+def remove_suffix(string: str, suffix: str):
+    # Removes the specified suffix from the string, if present.
+    if string.endswith(suffix):
+        string = string[: -len(suffix)]
+    return string
+
+
 def snake2camel(string: str):
     """Convert snake_case to CamelCase.
 
