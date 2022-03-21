@@ -25,6 +25,23 @@ class TransferEvent:
     target_path: str
 
 
+def catch_unathenticated(f, *args, **kwargs):
+    def aux(*args, **kwargs):
+        from google.auth.exceptions import RefreshError
+        try:
+            return f(*args, **kwargs)
+        except RefreshError as e:
+            if isinstance(e.args, tuple) and len(e.args) == 2:
+                if e.args[1] == {
+                    'error': 'invalid_grant', 
+                    'error_description': 'Bad Request'
+                }:
+                    cmd = "gcloud auth application-default login --no-launch-browser"
+                    raise ValueError(f"Captured potentially known error: {e}. Please make sure that " 
+                        f"you have authenticated your machine using '{cmd}' command")
+    return aux
+
+@catch_unathenticated
 def download_folder(
     project: str,
     source_dir: str,
@@ -73,6 +90,7 @@ def download_folder(
             wait(futures)
 
 
+@catch_unathenticated
 def download_files(
     project: str,
     bucket: str,
@@ -116,6 +134,7 @@ def download_files(
     return [event.target_path for event in events]
 
 
+@catch_unathenticated
 def upload_folder(
     project: str,
     source_dir: Union[Path, str],
@@ -153,6 +172,7 @@ def upload_folder(
             wait(futures)
 
 
+@catch_unathenticated
 def upload_files(
     project: str,
     paths: Sequence[Union[Path, str]],
