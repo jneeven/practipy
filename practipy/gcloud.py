@@ -39,6 +39,7 @@ def catch_unathenticated(f, *args, **kwargs):
                     cmd = "gcloud auth application-default login --no-launch-browser"
                     raise ValueError(f"Captured potentially known error: {e}. Please make sure that " 
                         f"you have authenticated your machine using '{cmd}' command")
+            raise e
     return aux
 
 @catch_unathenticated
