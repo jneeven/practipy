@@ -25,7 +25,7 @@ class TransferEvent:
     target_path: str
 
 
-def catch_unathenticated(f):
+def catch_unauthenticated(f):
     def aux(*args, **kwargs):
         from google.auth.exceptions import RefreshError
         try:
@@ -42,7 +42,7 @@ def catch_unathenticated(f):
             raise e
     return aux
 
-@catch_unathenticated
+@catch_unauthenticated
 def download_folder(
     project: str,
     source_dir: str,
@@ -91,7 +91,7 @@ def download_folder(
             wait(futures)
 
 
-@catch_unathenticated
+@catch_unauthenticated
 def download_files(
     project: str,
     bucket: str,
@@ -135,7 +135,7 @@ def download_files(
     return [event.target_path for event in events]
 
 
-@catch_unathenticated
+@catch_unauthenticated
 def upload_folder(
     project: str,
     source_dir: Union[Path, str],
@@ -173,7 +173,7 @@ def upload_folder(
             wait(futures)
 
 
-@catch_unathenticated
+@catch_unauthenticated
 def upload_files(
     project: str,
     paths: Sequence[Union[Path, str]],
