@@ -25,7 +25,7 @@ class TransferEvent:
     target_path: str
 
 
-def catch_unathenticated(f, *args, **kwargs):
+def catch_unathenticated(f):
     def aux(*args, **kwargs):
         from google.auth.exceptions import RefreshError
         try:
