@@ -1,13 +1,12 @@
 import functools
 import math
 import os
-import traceback
 from concurrent.futures import Future, ThreadPoolExecutor, as_completed, wait
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Literal, Sequence, Union
 
-from google.auth.exceptions import RefreshError
+from google.auth.exceptions import DefaultCredentialsError, RefreshError
 from google.cloud import storage as gcs
 from tqdm import tqdm
 
@@ -29,24 +28,29 @@ class TransferEvent:
 
 
 def catch_unauthenticated(f):
+    def _raise_error(e):
+        raise ValueError(
+            f"Captured potentially known {type(e).__name__}. "
+            "Please make sure that you have authenticated your machine using "
+            "`gcloud auth login` and `gcloud auth application-default login`."
+        )
+
     @functools.wraps(f)
     def wrapper(*args, **kwargs):
         try:
             return f(*args, **kwargs)
+        # Detect when exception stems from not being authenticated
         except RefreshError as e:
-            # Detect whene exception stems from not being authenticated
             if isinstance(e.args, tuple) and len(e.args) == 2:
                 if e.args[1] == {
                     "error": "invalid_grant",
                     "error_description": "Bad Request",
                 }:
-                    traceback.print_exc(e)
-                    raise ValueError(
-                        f"Captured potentially known error: {e}. "
-                        "Please make sure that you have authenticated your machine using "
-                        "`gcloud auth login` and `gcloud auth application-default login`."
-                    )
-            raise e
+                    _raise_error(e)
+            else:
+                raise e
+        except DefaultCredentialsError as e:
+            _raise_error(e)
 
     return wrapper
 
