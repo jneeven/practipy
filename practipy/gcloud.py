@@ -1,3 +1,4 @@
+import functools
 import math
 import os
 from concurrent.futures import Future, ThreadPoolExecutor, as_completed, wait
@@ -5,6 +6,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Literal, Sequence, Union
 
+from google.auth.exceptions import DefaultCredentialsError, RefreshError
 from google.cloud import storage as gcs
 from tqdm import tqdm
 
@@ -25,6 +27,26 @@ class TransferEvent:
     target_path: str
 
 
+def catch_unauthenticated(f):
+    def _raise_error(e):
+        raise ValueError(
+            f"Captured potentially known {type(e).__name__}. "
+            "Please make sure that you have authenticated your machine using "
+            "`gcloud auth login` and `gcloud auth application-default login`."
+        )
+
+    @functools.wraps(f)
+    def wrapper(*args, **kwargs):
+        try:
+            return f(*args, **kwargs)
+        # Detect when exception stems from not being authenticated
+        except (RefreshError, DefaultCredentialsError) as e:
+            _raise_error(e)
+
+    return wrapper
+
+
+@catch_unauthenticated
 def download_folder(
     project: str,
     source_dir: str,
@@ -73,6 +95,7 @@ def download_folder(
             wait(futures)
 
 
+@catch_unauthenticated
 def download_files(
     project: str,
     bucket: str,
@@ -116,6 +139,7 @@ def download_files(
     return [event.target_path for event in events]
 
 
+@catch_unauthenticated
 def upload_folder(
     project: str,
     source_dir: Union[Path, str],
@@ -153,6 +177,7 @@ def upload_folder(
             wait(futures)
 
 
+@catch_unauthenticated
 def upload_files(
     project: str,
     paths: Sequence[Union[Path, str]],
