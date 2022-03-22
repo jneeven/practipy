@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Literal, Sequence, Union
 
+from google.auth.exceptions import RefreshError
 from google.cloud import storage as gcs
 from tqdm import tqdm
 
@@ -32,21 +33,23 @@ def catch_unauthenticated(f):
     def wrapper(*args, **kwargs):
         try:
             return f(*args, **kwargs)
-        except Exception as e:
+        except RefreshError as e:
             # Detect whene exception stems from not being authenticated
             if isinstance(e.args, tuple) and len(e.args) == 2:
                 if e.args[1] == {
-                    'error': 'invalid_grant', 
-                    'error_description': 'Bad Request'
+                    "error": "invalid_grant",
+                    "error_description": "Bad Request",
                 }:
                     traceback.print_exc(e)
                     raise ValueError(
                         f"Captured potentially known error: {e}. "
                         "Please make sure that you have authenticated your machine using "
                         "`gcloud auth login` and `gcloud auth application-default login`."
-                    )    
+                    )
             raise e
+
     return wrapper
+
 
 @catch_unauthenticated
 def download_folder(
