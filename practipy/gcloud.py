@@ -40,16 +40,7 @@ def catch_unauthenticated(f):
         try:
             return f(*args, **kwargs)
         # Detect when exception stems from not being authenticated
-        except RefreshError as e:
-            if isinstance(e.args, tuple) and len(e.args) == 2:
-                if e.args[1] == {
-                    "error": "invalid_grant",
-                    "error_description": "Bad Request",
-                }:
-                    _raise_error(e)
-            else:
-                raise e
-        except DefaultCredentialsError as e:
+        except (RefreshError, DefaultCredentialsError) as e:
             _raise_error(e)
 
     return wrapper
