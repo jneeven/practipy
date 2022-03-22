@@ -1,5 +1,7 @@
+import functools
 import math
 import os
+import traceback
 from concurrent.futures import Future, ThreadPoolExecutor, as_completed, wait
 from dataclasses import dataclass
 from pathlib import Path
@@ -26,21 +28,25 @@ class TransferEvent:
 
 
 def catch_unauthenticated(f):
-    def aux(*args, **kwargs):
-        from google.auth.exceptions import RefreshError
+    @functools.wraps(f)
+    def wrapper(*args, **kwargs):
         try:
             return f(*args, **kwargs)
-        except RefreshError as e:
+        except Exception as e:
+            # Detect whene exception stems from not being authenticated
             if isinstance(e.args, tuple) and len(e.args) == 2:
                 if e.args[1] == {
                     'error': 'invalid_grant', 
                     'error_description': 'Bad Request'
                 }:
-                    cmd = "gcloud auth application-default login --no-launch-browser"
-                    raise ValueError(f"Captured potentially known error: {e}. Please make sure that " 
-                        f"you have authenticated your machine using '{cmd}' command")
+                    traceback.print_exc(e)
+                    raise ValueError(
+                        f"Captured potentially known error: {e}. "
+                        "Please make sure that you have authenticated your machine using "
+                        "`gcloud auth login` and `gcloud auth application-default login`."
+                    )    
             raise e
-    return aux
+    return wrapper
 
 @catch_unauthenticated
 def download_folder(
