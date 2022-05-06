@@ -55,7 +55,7 @@ class Dict(dict):
     @classmethod
     def intersection_of(cls, dicts: Sequence["Dict"]) -> "Dict":
         """Intersect a sequence of dictionaries based on their keys."""
-        return dicts[0].intersection(*dicts[1:])
+        return dicts[0].intersect(*dicts[1:])
 
     @classmethod
     def union_of(cls, dicts: Sequence["Dict"]) -> "Dict":
