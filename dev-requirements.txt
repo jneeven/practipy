@@ -1,6 +1,6 @@
-black==20.8b1
+black==22.3.0
 docformatter==1.4
-flake8==3.8.4
+flake8==4.0.1
 isort==5.7.0
 pytest==6.2.2
 pytest-custom-exit-code==0.3.0
