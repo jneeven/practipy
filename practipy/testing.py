@@ -19,7 +19,7 @@ class _NotImplementedDescriptor:
         )
 
 
-@functools.cache
+@functools.lru_cache(maxsize=1)
 def _get_default_attributes() -> set:
     """Returns the attributes that are defined on any class."""
     return set(dir(new_class("Stub")))
