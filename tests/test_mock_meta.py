@@ -61,7 +61,7 @@ def test_overridden_attributes():
     assert instance.ANOTHER_VARIABLE == 100  # Should be accessible from instance too
     assert instance.x == 1
     assert instance.function_b() == "Mocked value"
-    assert instance.function_c() == True
+    assert instance.function_c() is True
     assert instance.property_a == 3
 
 
