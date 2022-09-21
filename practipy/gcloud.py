@@ -140,6 +140,36 @@ def download_files(
 
 
 @catch_unauthenticated
+def download_file(
+    project: str,
+    gcs_path: str,
+    local_path: Union[Path, str],
+) -> bool:
+    """Downloads a GCS file to a local file.
+
+    If the local file already exists this does nothing and returns False. If the remote
+    file does not exist, raises FileNotFoundError. Otherwise returns True.
+    """
+    local_path = Path(local_path)
+    if local_path.exists():
+        return False
+
+    source_dir = Path(remove_prefix(gcs_path, "gs://"))
+    bucket_name = source_dir.parts[0]
+    source_path = str(source_dir.relative_to(bucket_name))
+
+    bucket = gcs.Client(project=project).get_bucket(bucket_name)
+    blob = bucket.get_blob(source_path)
+    if blob is None:
+        raise FileNotFoundError(gcs_path)
+
+    local_path.parent.mkdir(parents=True, exist_ok=True)
+    blob.download_to_filename(str(local_path))
+
+    return True
+
+
+@catch_unauthenticated
 def upload_folder(
     project: str,
     source_dir: Union[Path, str],
