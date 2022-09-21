@@ -148,7 +148,7 @@ def download_file(
     """Downloads a GCS file to a local file.
 
     If the local file already exists this does nothing and returns False.
-    If the remote file does not exist, returns False.
+    If the remote file does not exist, raises FileNotFoundError.
     Otherwise returns True.
     """
     local_path = Path(local_path)
@@ -162,7 +162,7 @@ def download_file(
     bucket = gcs.Client(project=project).get_bucket(bucket_name)
     blob = bucket.get_blob(source_path)
     if blob is None:
-        return False
+        raise FileNotFoundError(gcs_path)
 
     local_path.parent.mkdir(parents=True, exist_ok=True)
     blob.download_to_filename(str(local_path))
