@@ -147,9 +147,8 @@ def download_file(
 ) -> bool:
     """Downloads a GCS file to a local file.
 
-    If the local file already exists this does nothing and returns False.
-    If the remote file does not exist, raises FileNotFoundError.
-    Otherwise returns True.
+    If the local file already exists this does nothing and returns False. If the remote
+    file does not exist, raises FileNotFoundError. Otherwise returns True.
     """
     local_path = Path(local_path)
     if local_path.exists():
