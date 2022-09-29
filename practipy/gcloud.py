@@ -98,7 +98,7 @@ def download_folder(
 @catch_unauthenticated
 def download_files(
     project: str,
-    bucket: str,
+    bucket_name: str,
     gcs_paths: Sequence[str],
     download_dir: Union[Path, str],
     strip_prefix: str = "",
@@ -112,7 +112,7 @@ def download_files(
     Note: paths are relative to `gs://<bucket_name>`!.
     """
 
-    bucket = gcs.Client(project=project).get_bucket(bucket)
+    bucket = gcs.Client(project=project).bucket(bucket_name)
     blobs = [bucket.blob(gcs_path) for gcs_path in gcs_paths]
     download_dir = Path(download_dir)
 
@@ -158,7 +158,7 @@ def download_file(
     bucket_name = source_dir.parts[0]
     source_path = str(source_dir.relative_to(bucket_name))
 
-    bucket = gcs.Client(project=project).get_bucket(bucket_name)
+    bucket = gcs.Client(project=project).bucket(bucket_name)
     blob = bucket.get_blob(source_path)
     if blob is None:
         raise FileNotFoundError(gcs_path)
