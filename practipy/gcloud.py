@@ -189,7 +189,7 @@ def upload_folder(
     bucket_name = target_dir.parts[0]
     target_dir = str(target_dir.relative_to(bucket_name))
 
-    bucket = gcs.Client(project=project).get_bucket(str(bucket_name))
+    bucket = gcs.Client(project=project).bucket(str(bucket_name))
 
     # Note: This will overwrite any blobs that already exist.
     def upload_file(file: Path) -> TransferEvent:
@@ -227,7 +227,7 @@ def upload_files(
     bucket_name = target_dir.parts[0]
     target_dir = str(target_dir.relative_to(bucket_name))
 
-    bucket = gcs.Client(project=project).get_bucket(str(bucket_name))
+    bucket = gcs.Client(project=project).bucket(str(bucket_name))
 
     # Note: This will overwrite any blobs that already exist.
     def upload_file(file: Path) -> TransferEvent:
